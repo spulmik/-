@@ -1,16 +1,16 @@
 <?php
 
 log_debug("Входящий запрос: " . print_r($_REQUEST, true));
-
+//Отладка
 header('Access-Control-Allow-Origin: *');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
+//Отладка, но в папку и поподробнее
 function log_debug($message) {
     $log = date('[Y-m-d H:i:s]') . " " . $message . "\n";
     file_put_contents('debug.log', $log, FILE_APPEND);
 }
-
+//Пост дал, установка
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_REQUEST['AUTH_ID'], $_REQUEST['DOMAIN'])) {
     log_debug("Начало установки приложения");
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_REQUEST['AUTH_ID'], $_REQUE
             'error' => ['Name' => ['ru' => 'Ошибка'], 'Type' => 'string']
         ]
     ];
-
+    //Метод
     $url = "https://$domain/rest/bizproc.activity.add.json?auth=$auth";
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_REQUEST['AUTH_ID'], $_REQUE
     echo 'Действие зарегистрировано. Ответ: ' . $result;
     exit;
 }
-
+//Пост взял, уже реализация приложения
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_REQUEST['properties']['deal_id'], $_REQUEST['auth']['access_token'])) {
     log_debug("Начало выполнения действия");
 
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_REQUEST['properties']['deal
     $comment = '';
     $dealUpdated = false;
     $error = '';
-
+//Также метод, но мы будем брать содержимое комментария
     $url = "https://$domain/rest/crm.timeline.comment.list.json";
     $queryParams = http_build_query([
         'auth' => $auth,
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_REQUEST['properties']['deal
             log_debug($error . ": " . json_last_error_msg());
         }
     }
-
+//Костыль, чтобы бесконечное кол-во не загружал БП, есть варик разделить файлы
     if (!empty($comment)) {
         preg_match('/Покупатель: (.+?)(\\n|$)/u', $comment, $buyerMatch);
         preg_match('/Комментарий: (.+?)(\\n|$)/u', $comment, $commentMatch);
@@ -146,7 +146,7 @@ if (strpos($currentComments, $commentOnly) !== false) {
     ]);
     exit;
 }
-
+//Добрались до обновления полей
         $fieldsToUpdate = [];
         if (!empty($commentOnly)) $fieldsToUpdate['COMMENTS'] = $commentOnly;
         if (!empty($buyer)) $fieldsToUpdate[$customerFieldCode] = $buyer;
